@@ -1,0 +1,402 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Dresden}
+\usecolortheme{beaver}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{default}
+
+\title{Applied Data Science Capstone}
+\subtitle{Week 5 Presentation}
+\author{Kyle Thomsen}
+\date{22 Dec 2019}
+
+\pdfinfo{%
+  /Title    ()
+  /Author   (K. Thomsen)
+  /Creator  (K. Thomsen)
+  /Producer ()
+  /Subject  ()
+  /Keywords ()
+}
+
+\hypersetup{pdfstartview={Fit}}
+
+\defbeamertemplate*{title page}{customized}[1][]
+{
+  \begin{center}
+  \usebeamerfont{title}\huge{\inserttitle}\par
+  \usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par
+  \bigskip
+  \usebeamerfont{author}\insertauthor\par
+%   \usebeamerfont{institute}\insertinstitute\par
+  \usebeamerfont{date}\insertdate\par
+  \end{center}
+}
+
+% \setbeamertemplate{footline}[frame number]
+\makeatletter
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\inserttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+    \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\makeatother
+% \setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+
+
+% \AtBeginSubsection[]
+% {
+%    \begin{frame}
+% }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\maketitle
+
+
+
+
+\section{Introduction}
+\subsection{Introduction}
+\begin{frame}
+
+% \textit{\small{Discussion of the business problem and who would be interested in this project.}}
+
+\begin{itemize}
+ \item For my project, I have decided to tackle the question of determining which Toronto neighborhood would be most suitable for the opening of a new franchise for a restaurant based on the current density of similar places.
+ \item Neighborhoods with lower restaurant densities would provide less competition for the new franchise. The target audience of such a study would be the owners of a company seeking to expand its operations into the Toronto area.
+ \item They could use the results of this analysis to narrow down the potential sites for the new location. Furthermore, doing so would allow them to focus their resources on investigating just the list of locations obtained here instead of the whole of Toronto.
+\end{itemize}
+
+\end{frame}
+
+
+
+% \subsubsection{}
+% \begin{frame}
+%  \begin{itemize}
+%   \item 
+%   \end{itemize}
+% \end{frame}
+
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Data}
+\subsection{Data}
+\begin{frame}
+% \textit{\small{Description of the data that will be used to solve the problem and the source of the data.}}
+
+To assess which Toronto neighborhood would most benefit from the addition of a new restaurant, it would be necessary to determine which neighborhood has the lowest density of current restaurants. This requires a couple of parameters:
+
+\begin{itemize}
+ \item the total number of restaurants in the neighborhood
+ \item the total area of the neighborhood
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\begin{itemize}
+ \item By finding the ratio of these two numbers, it is possible to determine which neighborhood has the lowest restaurant density.
+ \item Therefore, it is possible to determine the neighborhood in which the company will have the least competition for consumers.
+ \item While the area of each neighborhood is a matter of trivial geometry, the number of venues within its borders is more difficult to ascertain. By leveraging the Foursquare API, it is possible to determine the number of venues with a type similar to "restaurant" for each neighborhood and thereby determine the baseline competition the new franchise will encounter in each neighborhood.
+
+ \item An example of the sort of data that will be collected is a list of the venues for each neighborhood. A feature which can be extracted from these data is the category of each venue, which will then allow me to focus on only those which are considered restaurants. A more concrete example of this is included in the following table.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\footnotesize{
+\begin{center}
+% \hspace{-.15\textwidth}
+\begin{tabular}{|l|l|l|l|l|}
+% Neighborhood & Neighborhood Latitude & Neighborhood Longitude & Venue & Venue Latitude & Venue Longitude & Venue Category\\\hline
+Neighborhood & Venue & Venue Lat & Venue Long & Venue Cat\\\hline
+Malvern, Rouge & Wendy's & 43.807448 & -79.199056 & Fast Food Restaurant\\\hline
+Port Union, etc. & Royal Canadian Legion & 43.782533 & -79.163085 & Bar\\\hline
+West Hill, etc. & Swiss Chalet Rotisserie \& Grill & 43.767697 & -79.189914 & Pizza Place\\\hline
+West Hill, etc. & G \& G Electronics & 43.765309 & -79.191537 & Electronics Store\\\hline
+West Hill, etc.  & Big Bite Burrito & 43.766299 & -79.190720 & Mexican Restaurant\\\hline
+\end{tabular}
+\end{center}}
+\end{frame}
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Methodology}
+
+\subsection{Methodology}
+
+\subsubsection{}
+\begin{frame}
+% \textit{\small{The main component of the report, with discussion and description of any exploratory data analysis and inferential statistical testing was performed and what machine learning techniques were used and why.}}
+
+\begin{itemize}
+ \item To answer this question, I began by associating the neighborhoods near each postal code in the Toronto area with the latitude and longitude of the center of the postal code's designated area.
+ \item I accomplished this by first scraping \href{https://en.wikipedia.org/wiki/List_of_postal_codes_of_Canada:_M}{the list of Toronto postal codes on Wikipedia} using BeautifulSoup.
+ \item This involved identifying the HTML tags associated with the table, namely $<$tbody$>$, associating the elements of the *.contents attribute with the table's rows, and appending each row to an array of strings.
+ \item In order to transmute this array into a DataFrame, I split the string corresponding to each row into its three component cells, corresponding to a triple consisting of a postcode, borough, and neighborhood.
+ \item In order to facilitate integration with the Foursquare API, I opted to group together the neighborhoods which shared a postcode before associating each group with the latitude and longitude of its center. These mappings were obtained by reusing the Geospatial\_Coordinates.csv file from the week 3 assignment.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\begin{itemize}
+ \item After initializing my connection to the Foursquare API, I configured the parameters defining the maximum number of venues to return for each query and the radius around each latitude/longitude pair in which venues should be located.
+ \item I eventually settled on a venue maximum of 1000 and a radius of 1000 meters. After obtaining the results from Foursquare as a JSON object, I then extracted the category for each venue.
+ \item After obtaining the venues for each neighborhood group, I then used one-hot encoding to analyze the categories present in each neighborhood.
+ \item I filtered the categories to only retain those indicating a type of restaurant before summing the total number of restaurants associated with each group of neighborhoods.
+
+\end{itemize}
+ \end{frame}
+ 
+ \begin{frame}
+ \begin{itemize}
+  \item Finally, to obtain the restaurant density for each group, I simply divided the total number of restaurants by the area over which the Foursquare API searched for venues.
+  \item In this case, that area is 1000 m * 1000 m * $\pi$ = $\pi$ * 10\textsuperscript{6} m\textsuperscript{2} = $\pi$ km\textsuperscript{2}.
+  \item While the densities produced are quite small, as they are given in units of restaurants per square meter, the sorting of the neighborhoods by density is independent of the units used.
+ \end{itemize}
+
+\end{frame}
+
+% \subsubsection{}
+% \begin{frame}
+%  \begin{center}
+% %  \includegraphics[width=11cm]{meg_beam.png} 
+%  \end{center}
+% \end{frame}
+% 
+% \subsection{subsection 2}
+% 
+% \subsubsection{}
+% \begin{frame}
+%  \begin{itemize}
+%   \item 
+%   \begin{itemize}
+%    \item 
+%   \end{itemize}
+%  \end{itemize}
+% \end{frame}
+% 
+% \subsection{subsection 3}
+% 
+% \subsubsection{}
+% \begin{frame}
+%  \begin{itemize}
+%   \item 
+%   \begin{itemize}
+%    \item 
+%   \end{itemize}
+%  \end{itemize}
+% \end{frame}
+% 
+% \subsubsection{}
+% \begin{frame}
+%  \begin{center}
+% %  \includegraphics[width=8cm]{meg_detector.png} 
+%  \end{center}
+% \end{frame}
+% 
+% \subsubsection{}
+% \begin{frame}
+%  \begin{center}
+% %  \includegraphics[height=8cm]{meg_drift_chamber.png} 
+%  \end{center}
+% \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Results}
+
+\subsection{Results}
+
+\begin{frame}
+% Discussion of the results.
+
+The results of my analysis revealed that the following neighborhoods all have the minimum restaurant density:
+
+\begin{itemize}
+ \item Port Union, Rouge Hill, Highland Creek
+ \item Malvern, Rouge
+ \item West Deane Park, Princess Gardens, Martin Grove, Islington, Cloverdale
+ \item Weston
+ \item Scarborough Village
+ \item Humberlea, Emery
+ \item York Mills, Silver Hills
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+while these neighborhoods all have the same maximum value for theirs:
+
+\begin{itemize}
+ \item Toronto Dominion Centre, Design Exchange
+ \item St. James Town
+ \item Victoria Hotel, Commerce Court
+ \item Garden District, Ryerson
+ \item Union Station, Toronto Islands, Harbourfront East
+ \item Underground city, First Canadian Place
+ \item Richmond, King, Adelaide
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{itemize}
+ \item To have such a large number of neighborhoods tied for both density extrema is an artifact of the ultimately discrete nature of the Foursquare API.
+ \item Specifically, the minimum value of 3.183099 * 10\textsuperscript{-7} restaurants per m\textsuperscript{2} corresponds to only one restaurant in the search area, while the maximum of 3.183099 * 10\textsuperscript{-5} restaurants per m\textsuperscript{2} corresponds to 100 restaurants in the search area.
+ \item The minimum seems sensible, as there is almost always a restaurant within a kilometer of any given location in a major city.
+ \item However, the repetition of the maximum value is curious; there doesn't appear to be a reason behind the 100-restaurant maximum inherent in one's intuition about urban environments.
+ \item In this respect, I suspect that this is some sort of internal limitation of my free Foursquare developer account.
+\end{itemize}
+
+% \begin{frame}
+%  \begin{itemize}
+%   \item 
+%  \end{itemize}
+%  \begin{center}
+% %   \includegraphics{meg_results.png}
+%  \end{center}
+% \end{frame}
+% 
+% \subsubsection{}
+% \begin{frame}
+%  \begin{center}
+% %   \includegraphics{meg_results1.png}
+%  \end{center}
+% \end{frame}
+% 
+% \subsubsection{}
+% \begin{frame}
+%  \begin{itemize}
+%   \item 
+%  \end{itemize}
+% 
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Discussion}
+
+\subsection{Discussion}
+
+\subsubsection{}
+\begin{frame}
+% Discussion of any observations and recommendations based on the results.
+
+The lists of neighborhoods give the best and the worst places for the new restaurant to be opened. With the minimum restaurant density, the new restaurant will have less competition; correspondingly, those neighborhoods with the maximal density are already saturated with restaurants. This means that any of these neighborhoods would be a suitable location for the new restaurant:
+
+\begin{multicols}{2}
+ \begin{itemize}
+  \item Port Union
+  \item Rouge Hill
+  \item Highland Creek
+  \item Malvern
+  \item Rouge
+  \item West Deane Park
+  \item Princess Gardens
+  \item Martin Grove
+  \end{itemize}
+  
+\columnbreak
+
+  \begin{itemize}
+  \item Islington
+  \item Cloverdale
+  \item Weston
+  \item Scarborough Village
+  \item Humberlea
+  \item Emery
+  \item York Mills
+  \item Silver Hills
+ \end{itemize}
+%  \begin{center}
+% %   \includegraphics{meg_results.png}
+%  \end{center}
+\end{multicols}
+\end{frame}
+
+\subsubsection{}
+\begin{frame}
+%  \begin{center}
+\begin{itemize}
+ \item Since this doesn't narrow down the potential optimal locations to a satisfactory degree, my recommendation to the restaurant owners would be to consider a follow-up analysis on this subset of neighborhoods in order to further pare it down.
+ \item This could be based on, for example, the accessibility and local tastes of each neighborhood.
+ \item In this way, this list of sixteen neighborhoods may be filtered down to just a few.
+ \item Upon selecting a neighborhood, it would be beneficial to give further consideration to the new restaurant's location within the neighborhood in order to maximize its business opportunities.
+\end{itemize}
+%   \includegraphics{meg_results1.png}
+%  \end{center}
+\end{frame}
+
+% \subsubsection{}
+% \begin{frame}
+%  \begin{itemize}
+%   \item 
+%  \end{itemize}
+% 
+% \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Conclusion}
+
+\subsection{Conclusion}
+
+
+
+\subsubsection{}
+\begin{frame}
+\begin{itemize}
+ \item This analysis has produced a list of sixteen neighborhoods which are each associated with only one restaurant within a kilometer of their centers.
+ \item Thus, it would be of benefit for the restaurant owners to select one of them for the new location.
+ \item This would minimize the competition encountered at the new location, which in turn would offer it the greatest chances to thrive.
+ \item While more analysis can be conducted to refine these results, the reduction from the full list of all 140 Toronto neighborhoods to 16 represents a narrowing of the options by 88.6\%. This would yield, if not a specific location recommendation for the future restaurant, something far closer to one than existed before this analysis was conducted.
+\end{itemize}
+%  \begin{itemize}
+%   \item 
+%  \end{itemize}
+%  \begin{center}
+% %   \includegraphics{meg_results.png}
+%  \end{center}
+\end{frame}
+
+% \subsubsection{}
+% \begin{frame}
+%  \begin{center}
+% %   \includegraphics{meg_results1.png}
+%  \end{center}
+% \end{frame}
+% 
+% \subsubsection{}
+% \begin{frame}
+%  \begin{itemize}
+%   \item 
+%  \end{itemize}
+% 
+% \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
